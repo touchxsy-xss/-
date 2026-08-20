@@ -1,0 +1,15 @@
+# Runtime secrets and persistent data are provisioned on the server, never committed.
+.env
+.env.*
+!.env.example
+data/
+certs/
+uploads/
+backups/
+public.backup-*/
+
+# Local interpreter and operating-system artifacts.
+__pycache__/
+*.py[cod]
+.DS_Store
+._*

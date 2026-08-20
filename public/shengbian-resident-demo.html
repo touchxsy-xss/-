@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#102820" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23174f3c'/%3E%3Cpath d='M14 27 32 18l18 9' fill='none' stroke='%23d8171f' stroke-width='7'/%3E%3Cpath d='M23 32h6v15h-6zm12-5h6v20h-6z' fill='%23d8171f'/%3E%3C/svg%3E" />
+  <title>声边｜角色与使用链路 V0.1</title>
+  <style>
+    :root {
+      --ink: #17342b;
+      --ink-2: #23483c;
+      --evergreen: #0e2d24;
+      --forest: #174f3c;
+      --pine: #22664d;
+      --mint: #d9eee1;
+      --mist: #f3f7f3;
+      --paper: #fbfcfa;
+      --line: #dce7df;
+      --line-dark: rgba(255,255,255,.13);
+      --lime: #b9e66f;
+      --sun: #f4bd58;
+      --coral: #ea826b;
+      --blue: #77b8e9;
+      --muted: #73877d;
+      --shadow: 0 18px 55px rgba(21, 61, 43, .14);
+      --soft-shadow: 0 8px 22px rgba(16, 49, 35, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: #edf3ef;
+      letter-spacing: .01em;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .page-shell {
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      padding: 26px clamp(16px, 4vw, 64px) 56px;
+      background:
+        radial-gradient(circle at 8% 2%, rgba(185, 230, 111, .2), transparent 23rem),
+        radial-gradient(circle at 93% 10%, rgba(119, 184, 233, .17), transparent 22rem),
+        linear-gradient(180deg, #f5f8f4 0%, #e8f0eb 100%);
+    }
+    .page-shell::after {
+      content: "";
+      position: absolute;
+      width: 460px;
+      height: 460px;
+      right: -230px;
+      bottom: 2%;
+      border-radius: 50%;
+      border: 1px solid rgba(40, 104, 77, .08);
+      box-shadow: 0 0 0 42px rgba(40, 104, 77, .035), 0 0 0 84px rgba(40, 104, 77, .02);
+      pointer-events: none;
+    }
+
+    .topbar {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; color: var(--evergreen); font-weight: 850; font-size: 21px; letter-spacing: -.02em; }
+    .brand-logo { display: block; flex: 0 0 auto; width: 72px; height: 54px; object-fit: contain; }
+    .brand-name { margin-left: -8px; }
+    .brand-mark {
+      width: 37px;
+      height: 37px;
+      display: grid;
+      place-items: center;
+      color: #123328;
+      background: var(--lime);
+      border-radius: 12px 12px 12px 4px;
+      box-shadow: inset 0 0 0 1px rgba(17, 57, 40, .1);
+      font-size: 19px;
+      transform: rotate(-3deg);
+    }
+    .prototype-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(23, 79, 58, .1);
+      color: #5d7569;
+      font-size: 12px;
+    }
+    .pulse { width: 7px; height: 7px; background: #69bd75; border-radius: 50%; box-shadow: 0 0 0 4px rgba(105,189,117,.15); }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      width: min(1440px, 100%);
+      margin: 54px auto 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(310px, .7fr);
+      align-items: end;
+      gap: 26px;
+    }
+    .eyebrow { margin: 0 0 12px; color: #4d7865; font-size: 12px; font-weight: 800; letter-spacing: .15em; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 790px; margin-bottom: 16px; font-size: clamp(35px, 5vw, 68px); line-height: 1.04; letter-spacing: -.07em; color: var(--evergreen); }
+    h1 em { color: #4d9770; font-style: normal; }
+    .hero-copy { max-width: 690px; color: #627a6e; font-size: 16px; line-height: 1.78; }
+    .loop-note {
+      position: relative;
+      padding: 24px 28px;
+      color: #dcebdd;
+      background: var(--evergreen);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .loop-note::before { content: ""; position: absolute; right: -20px; top: -52px; width: 145px; height: 145px; border-radius: 50%; border: 24px solid rgba(185,230,111,.14); }
+    .loop-note small { position: relative; color: #a9c3b4; font-size: 11px; letter-spacing: .13em; }
+    .loop-path { position: relative; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin-top: 15px; font-size: 14px; font-weight: 700; }
+    .loop-path b { color: var(--lime); font-size: 13px; }
+
+    .role-switcher {
+      position: relative;
+      z-index: 1;
+      width: min(1440px, 100%);
+      margin: 0 auto 18px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 7px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(41, 86, 66, .1);
+      border-radius: 17px;
+      box-shadow: 0 7px 19px rgba(26, 72, 50, .05);
+    }
+    .role-button {
+      flex: 1 1 210px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 45px;
+      padding: 8px 14px;
+      color: #6c8377;
+      background: transparent;
+      border: 0;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 750;
+      transition: .2s ease;
+    }
+    .role-button:hover { color: var(--ink); background: rgba(217,238,225,.72); }
+    .role-button.active { color: #fff; background: var(--forest); box-shadow: 0 7px 18px rgba(23,79,58,.22); }
+    .role-icon { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px; background: rgba(255,255,255,.18); font-size: 12px; }
+
+    .prototype {
+      position: relative;
+      z-index: 1;
+      width: min(1440px, 100%);
+      min-height: 755px;
+      margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid rgba(41, 86, 66, .12);
+      border-radius: 24px;
+      box-shadow: 0 20px 68px rgba(17, 57, 40, .15);
+      overflow: hidden;
+    }
+    .app-ambient { position: absolute; width: 540px; height: 540px; top: -400px; right: -205px; border-radius: 50%; background: radial-gradient(circle, rgba(185,230,111,.22), rgba(185,230,111,0) 67%); pointer-events: none; }
+    .role-view { display: none; min-height: 755px; }
+    .role-view.active { display: grid; grid-template-columns: 232px minmax(0, 1fr); }
+
+    .sidebar {
+      position: relative;
+      padding: 24px 13px 18px;
+      color: #c3d6c9;
+      background: linear-gradient(155deg, #123b2e, #0e2c23 72%);
+    }
+    .side-brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 27px; color: #fff; font-size: 16px; font-weight: 800; }
+    .side-brand .brand-logo { width: 38px; height: 30px; padding: 2px; border-radius: 8px; background: rgba(255,255,255,.94); box-shadow: 0 5px 14px rgba(0,0,0,.12); }
+    .side-brand .brand-mark { width: 28px; height: 28px; border-radius: 9px 9px 9px 3px; font-size: 14px; }
+    .side-project { padding: 14px 12px; margin: 0 0 20px; border: 1px solid var(--line-dark); border-radius: 13px; background: rgba(255,255,255,.055); }
+    .side-project small { display: block; margin-bottom: 4px; color: #8eae9d; font-size: 10px; letter-spacing: .12em; }
+    .side-project strong { display: flex; justify-content: space-between; align-items: center; color: #f0f7f1; font-size: 13px; }
+    .nav-group { margin: 0 0 19px; }
+    .nav-label { display: block; padding: 0 11px 7px; color: #729381; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 39px;
+      padding: 8px 11px;
+      margin: 2px 0;
+      color: #bbd0c1;
+      background: transparent;
+      border: 0;
+      border-radius: 9px;
+      text-align: left;
+      font-size: 12px;
+      transition: .18s ease;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
+    .nav-item.active { color: #fff; background: rgba(185,230,111,.16); }
+    .nav-item .nav-symbol { width: 18px; color: var(--lime); text-align: center; }
+    .nav-count { margin-left: auto; min-width: 19px; padding: 2px 5px; border-radius: 99px; color: #183d2e; background: var(--lime); font-size: 10px; font-weight: 800; text-align: center; }
+    .side-user { position: absolute; right: 13px; bottom: 17px; left: 13px; display: flex; align-items: center; gap: 9px; padding: 10px; border-top: 1px solid var(--line-dark); color: #eef7ef; font-size: 11px; }
+    .avatar { display: grid; flex: 0 0 auto; place-items: center; width: 27px; height: 27px; color: #fff; border-radius: 50%; background: linear-gradient(135deg, #61ae88, #376a56); font-size: 11px; font-weight: 800; }
+    .side-user small { display: block; margin-top: 2px; color: #84a492; font-size: 9px; }
+
+    .workarea { min-width: 0; padding: 26px clamp(19px, 2.2vw, 33px) 32px; }
+    .workbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 23px; }
+    .workbar .eyebrow { margin-bottom: 6px; font-size: 10px; }
+    .workbar h2 { margin-bottom: 0; color: var(--evergreen); font-size: 24px; letter-spacing: -.055em; }
+    .workbar h2 span { display: inline-flex; vertical-align: middle; margin-left: 7px; padding: 3px 7px; border-radius: 99px; color: #39775a; background: #e1f1e5; font-size: 10px; font-weight: 800; letter-spacing: 0; }
+    .workbar-actions { display: flex; gap: 8px; align-items: center; }
+    .subtle-button, .primary-button, .outline-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 8px 11px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .subtle-button { color: #597367; background: #f4f7f4; border: 1px solid var(--line); }
+    .primary-button { color: #14362a; background: var(--lime); border: 1px solid #acd969; box-shadow: 0 5px 12px rgba(126,180,71,.18); }
+    .outline-button { color: #39775a; background: #fff; border: 1px solid #a7ceb4; }
+    .subtle-button:hover, .outline-button:hover { background: #edf6ee; }
+    .primary-button:hover { background: #c6ef82; }
+    .screen { display: none; animation: lift .32s ease both; }
+    .screen.active { display: block; }
+    @keyframes lift { from { opacity: .25; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; margin-bottom: 12px; }
+    .metric-card { position: relative; min-height: 116px; padding: 15px; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 4px 13px rgba(34,77,57,.035); }
+    .metric-card::after { content: ""; position: absolute; width: 48px; height: 48px; right: -16px; bottom: -17px; border: 10px solid #eef6ef; border-radius: 50%; }
+    .metric-card.urgent::after { border-color: #fff0ec; }
+    .metric-card .metric-label { display: block; color: #74897d; font-size: 10px; font-weight: 700; }
+    .metric-value { display: block; margin: 10px 0 6px; color: #173e2e; font-size: 24px; font-weight: 850; line-height: 1; letter-spacing: -.06em; }
+    .metric-meta { position: relative; z-index: 1; color: #749384; font-size: 10px; }
+    .up { color: #4f9b70; font-weight: 800; }
+    .warn { color: #d8765f; font-weight: 800; }
+    .metric-icon { position: absolute; top: 14px; right: 13px; color: #54a078; font-size: 15px; }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(240px, .82fr); gap: 12px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 15px; box-shadow: 0 4px 14px rgba(34,77,57,.035); }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 16px 17px 11px; }
+    .card h3 { margin: 0; color: #193d2f; font-size: 13px; letter-spacing: -.02em; }
+    .linkish { padding: 0; color: #4e9570; background: none; border: 0; font-size: 10px; font-weight: 800; }
+    .bar-row { display: grid; grid-template-columns: 80px 1fr 44px; align-items: center; gap: 9px; padding: 7px 17px; color: #607a6d; font-size: 10px; }
+    .bar { height: 7px; overflow: hidden; border-radius: 99px; background: #edf3ee; }
+    .bar > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #75bf87, #c5e86f); }
+    .bar-row b { color: #365f4c; font-size: 10px; text-align: right; }
+    .chart-foot { display: flex; justify-content: space-between; padding: 10px 17px 16px; color: #8ba094; font-size: 9px; }
+    .alert-list { padding: 0 11px 11px; }
+    .alert-item { display: grid; grid-template-columns: 6px 1fr auto; gap: 9px; align-items: start; padding: 11px 6px; border-top: 1px solid #edf2ee; }
+    .alert-dot { width: 6px; height: 6px; margin-top: 4px; border-radius: 50%; background: #f0bb56; }
+    .alert-dot.high { background: #e77e68; box-shadow: 0 0 0 3px #fff0ec; }
+    .alert-item strong { display: block; margin-bottom: 4px; color: #315847; font-size: 10px; line-height: 1.3; }
+    .alert-item span { color: #84998e; font-size: 9px; line-height: 1.4; }
+    .alert-tag { padding: 4px 5px; border-radius: 5px; color: #ad634e; background: #fff0eb; font-size: 8px; font-weight: 800; }
+    .alert-tag.watch { color: #a0782f; background: #fff5dc; }
+    .material-card { margin-top: 12px; }
+    .material-stream { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; padding: 0 16px 16px; }
+    .material-piece { min-height: 98px; padding: 13px 11px; background: #f5f8f5; border-right: 1px solid #e6eee8; }
+    .material-piece:first-child { border-radius: 10px 0 0 10px; }
+    .material-piece:last-child { border: 0; border-radius: 0 10px 10px 0; }
+    .material-piece .mini-icon { display: grid; place-items: center; width: 27px; height: 27px; margin-bottom: 9px; border-radius: 8px; color: #3d815e; background: #e0f0e3; font-size: 13px; }
+    .material-piece strong { display: block; color: #315847; font-size: 10px; }
+    .material-piece small { display: block; margin-top: 4px; color: #82978a; font-size: 9px; }
+
+    .ai-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-bottom: 12px; }
+    .signal-card { position: relative; min-height: 120px; padding: 16px; overflow: hidden; border-radius: 14px; }
+    .signal-card.risk { color: #6e352b; background: #fff0eb; border: 1px solid #ffdcd3; }
+    .signal-card.watch { color: #6d5728; background: #fff7e3; border: 1px solid #f5e2a7; }
+    .signal-card.good { color: #296143; background: #ecf7ed; border: 1px solid #cde9d1; }
+    .signal-card small { display: block; margin-bottom: 15px; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+    .signal-card strong { display: block; max-width: 170px; font-size: 14px; line-height: 1.35; letter-spacing: -.03em; }
+    .signal-card span { display: block; margin-top: 6px; font-size: 10px; opacity: .78; }
+    .signal-number { position: absolute; right: 13px; bottom: -11px; opacity: .16; font-size: 65px; font-weight: 900; letter-spacing: -.08em; }
+    .insight-list { padding: 0 16px 14px; }
+    .insight-row { display: grid; grid-template-columns: 29px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid #edf2ee; }
+    .insight-index { display: grid; place-items: center; width: 28px; height: 28px; color: #6a9e7c; border-radius: 8px; background: #eaf4ec; font-size: 11px; font-weight: 850; }
+    .insight-row strong { display: block; color: #315847; font-size: 11px; }
+    .insight-row small { display: block; margin-top: 3px; color: #82978a; font-size: 9px; }
+    .severity { padding: 4px 7px; border-radius: 99px; font-size: 9px; font-weight: 800; }
+    .severity.r { color: #ae5946; background: #fff0eb; }
+    .severity.w { color: #aa8027; background: #fff6dd; }
+    .severity.g { color: #417e58; background: #e9f5e9; }
+
+    .projects-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .project-card { padding: 17px; border: 1px solid var(--line); border-radius: 14px; background: #fff; transition: .2s ease; }
+    .project-card:hover { transform: translateY(-2px); box-shadow: var(--soft-shadow); }
+    .project-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .project-card b { color: #284f3e; font-size: 13px; }
+    .project-card small { color: #889c91; font-size: 9px; }
+    .project-stat { display: flex; gap: 15px; margin: 15px 0; }
+    .project-stat strong { display: block; color: #1d5039; font-size: 19px; letter-spacing: -.06em; }
+    .project-stat span { display: block; margin-top: 3px; color: #83988c; font-size: 9px; }
+    .project-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #edf2ee; color: #6f887b; font-size: 9px; }
+
+    .columns-layout { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(270px, .82fr); gap: 12px; }
+    .column-hero { padding: 19px; color: #e8f4eb; background: linear-gradient(145deg, #174c38, #123126); border-radius: 15px; }
+    .column-hero h3 { color: #fff; font-size: 17px; }
+    .column-hero p { max-width: 460px; margin: 9px 0 17px; color: #bcd4c3; font-size: 11px; line-height: 1.65; }
+    .audience-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .audience-pills span { padding: 5px 8px; color: #d9eee0; border: 1px solid rgba(255,255,255,.13); border-radius: 99px; background: rgba(255,255,255,.06); font-size: 9px; }
+    .production-flow { display: flex; align-items: center; gap: 8px; padding: 17px; }
+    .flow-node { flex: 1; min-width: 0; text-align: center; }
+    .flow-node b { display: grid; place-items: center; width: 33px; height: 33px; margin: 0 auto 7px; color: #2f7756; border-radius: 10px; background: #e6f3e8; font-size: 12px; }
+    .flow-node span { display: block; color: #567163; font-size: 9px; font-weight: 750; }
+    .flow-arrow { color: #94aa9c; font-size: 13px; }
+    .publish-list { padding: 0 15px 13px; }
+    .publish-row { display: flex; align-items: center; gap: 9px; padding: 11px 0; border-top: 1px solid #edf2ee; }
+    .publish-row .cover { width: 33px; height: 33px; border-radius: 8px; background: linear-gradient(135deg,#b9e66f,#62af89); }
+    .publish-row strong { display: block; color: #315847; font-size: 10px; }
+    .publish-row small { display: block; margin-top: 3px; color: #83998c; font-size: 9px; }
+
+    .service-overview { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(250px,.65fr); gap: 12px; }
+    .queue { padding: 0 15px 11px; }
+    .queue-row { display: grid; grid-template-columns: 30px minmax(0,1fr) 75px 63px; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #edf2ee; }
+    .queue-no { color: #94aa9e; font-size: 10px; font-weight: 800; }
+    .queue-row strong { display: block; color: #315847; font-size: 10px; }
+    .queue-row small { display: block; margin-top: 3px; color: #889d91; font-size: 9px; }
+    .queue-person { color: #628073; font-size: 9px; }
+    .status { display: inline-flex; align-items: center; justify-content: center; width: max-content; padding: 4px 7px; border-radius: 99px; font-size: 9px; font-weight: 800; white-space: nowrap; }
+    .status.wait { color: #9c782f; background: #fff5db; }
+    .status.handle { color: #367a59; background: #e8f5ea; }
+    .status.third { color: #697499; background: #eef1fa; }
+    .status.done { color: #567764; background: #edf3ee; }
+    .status.bad { color: #ad604d; background: #fff0eb; }
+    .upload-score { padding: 19px; color: #e5f2e8; background: linear-gradient(145deg,#286349,#174833); border-radius: 15px; }
+    .upload-score small { color: #b8d5c3; font-size: 10px; font-weight: 800; letter-spacing: .09em; }
+    .upload-score strong { display: block; margin: 15px 0 4px; color: #fff; font-size: 40px; line-height: 1; letter-spacing: -.08em; }
+    .upload-score span { color: #bdd8c8; font-size: 10px; }
+    .score-line { height: 6px; margin-top: 18px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.14); }
+    .score-line i { display: block; width: 84%; height: 100%; border-radius: inherit; background: var(--lime); }
+    .score-info { display: flex; justify-content: space-between; margin-top: 8px; color: #bcd4c3; font-size: 9px; }
+    .notice-draft { padding: 15px; margin-top: 12px; }
+    .notice-draft p { margin: 10px 0 13px; color: #627b6e; font-size: 10px; line-height: 1.6; }
+
+    .repairs-layout { display: grid; grid-template-columns: minmax(0,1.45fr) minmax(260px,.55fr); gap: 12px; }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 15px 12px; }
+    .filter-pills button { padding: 5px 8px; color: #779084; background: #f5f8f5; border: 1px solid #e3ece4; border-radius: 99px; font-size: 9px; }
+    .filter-pills button.active { color: #fff; background: #347657; border-color: #347657; }
+    .repair-table { padding: 0 15px 11px; }
+    .repair-header, .repair-item { display: grid; grid-template-columns: 82px minmax(115px,1.5fr) 72px 65px; gap: 8px; align-items: center; }
+    .repair-header { padding: 8px 0; color: #91a49a; border-top: 1px solid #edf2ee; font-size: 9px; }
+    .repair-item { padding: 10px 0; border-top: 1px solid #edf2ee; color: #597668; font-size: 9px; }
+    .repair-item strong { display: block; color: #315847; font-size: 10px; }
+    .repair-item small { display: block; margin-top: 3px; color: #8aa094; font-size: 9px; }
+    .detail-card { padding: 16px; }
+    .detail-card h3 { margin-bottom: 14px; }
+    .detail-title { color: #375d4b; font-size: 11px; line-height: 1.55; }
+    .detail-timeline { margin: 16px 0 4px 4px; padding-left: 17px; border-left: 1px solid #dce9df; }
+    .detail-timeline div { position: relative; padding: 0 0 15px; color: #657e71; font-size: 9px; line-height: 1.45; }
+    .detail-timeline div::before { content: ""; position: absolute; width: 8px; height: 8px; left: -22px; top: 2px; border-radius: 50%; background: #63ad80; box-shadow: 0 0 0 3px #e7f3ea; }
+    .detail-timeline div:last-child::before { background: #f1bb56; box-shadow: 0 0 0 3px #fff6df; }
+    .detail-timeline b { display: block; color: #446956; font-size: 10px; }
+    .media-dots { display: flex; gap: 5px; margin-top: 11px; }
+    .media-dots i { width: 30px; height: 22px; border-radius: 5px; background: linear-gradient(135deg,#a8cfac,#e5edae); }
+    .media-dots i:nth-child(2) { background: linear-gradient(135deg,#6cae8b,#c7e3d0); }
+    .media-dots i:nth-child(3) { background: linear-gradient(135deg,#f4d17c,#b3d4a4); }
+
+    .journal-layout { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(260px,.9fr); gap: 12px; }
+    .journal-source { padding: 16px; }
+    .source-file { display: flex; align-items: center; gap: 9px; padding: 10px 0; border-top: 1px solid #edf2ee; }
+    .source-file i { display: grid; place-items: center; width: 28px; height: 28px; color: #3e8964; border-radius: 8px; background: #e9f4eb; font-style: normal; font-size: 12px; }
+    .source-file b { display: block; color: #325846; font-size: 10px; }
+    .source-file small { display: block; margin-top: 3px; color: #8ba095; font-size: 9px; }
+    .source-file span { margin-left: auto; color: #5b946d; font-size: 9px; font-weight: 800; }
+    .journal-draft { padding: 17px; color: #e7f2e9; background: linear-gradient(145deg,#1e553e,#11382b); border-radius: 15px; }
+    .journal-draft small { color: #bbd3c2; font-size: 9px; }
+    .journal-draft h3 { margin: 11px 0 8px; color: #fff; font-size: 16px; line-height: 1.4; }
+    .journal-draft p { margin-bottom: 13px; color: #c7ddcd; font-size: 10px; line-height: 1.65; }
+    .article-stat { display: flex; gap: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.12); }
+    .article-stat b { display: block; color: var(--lime); font-size: 14px; }
+    .article-stat span { display: block; margin-top: 3px; color: #a9c5b3; font-size: 8px; }
+    .stepper { display: flex; align-items: flex-start; gap: 0; padding: 17px 16px; }
+    .step { position: relative; flex: 1; color: #8a9e93; font-size: 9px; text-align: center; }
+    .step::before { content: ""; display: block; width: 20px; height: 20px; margin: 0 auto 7px; border: 4px solid #e4ece6; border-radius: 50%; background: #fff; }
+    .step:not(:last-child)::after { content: ""; position: absolute; top: 9px; left: calc(50% + 12px); width: calc(100% - 24px); height: 2px; background: #e4ece6; }
+    .step.done, .step.current { color: #347958; font-weight: 800; }
+    .step.done::before { border-color: #6db784; background: #6db784; box-shadow: inset 0 0 0 3px #fff; }
+    .step.done::after { background: #7fbe91; }
+    .step.current::before { border-color: var(--lime); background: var(--lime); }
+
+    .resident-view { background: #eff5f0; }
+    .resident-layout { display: grid; grid-template-columns: minmax(290px,.75fr) minmax(270px,.95fr); align-items: center; gap: clamp(26px,4vw,60px); min-height: 755px; padding: 36px clamp(26px,5vw,75px); }
+    .resident-copy { align-self: center; }
+    .resident-copy .eyebrow { color: #4c8065; }
+    .resident-copy h2 { max-width: 480px; margin-bottom: 16px; color: var(--evergreen); font-size: clamp(27px,3vw,42px); line-height: 1.1; letter-spacing: -.07em; }
+    .resident-copy > p { max-width: 500px; color: #638074; font-size: 13px; line-height: 1.75; }
+    .resident-benefits { display: grid; gap: 9px; margin-top: 24px; }
+    .resident-benefit { display: flex; align-items: center; gap: 11px; color: #426956; font-size: 11px; }
+    .resident-benefit i { display: grid; place-items: center; width: 28px; height: 28px; color: #337c58; border-radius: 9px; background: #dff0e3; font-style: normal; }
+    .callout { max-width: 480px; margin-top: 26px; padding: 15px; color: #507160; border-left: 3px solid var(--lime); background: rgba(255,255,255,.72); font-size: 11px; line-height: 1.65; }
+    .callout b { color: #276145; }
+    .phone-wrap { position: relative; display: grid; place-items: center; }
+    .phone-shadow { position: absolute; width: 290px; height: 65px; bottom: -9px; border-radius: 50%; background: rgba(18,68,48,.17); filter: blur(15px); }
+    .phone { position: relative; z-index: 1; width: min(100%, 350px); height: 660px; overflow: hidden; border: 9px solid #15362b; border-radius: 42px; background: #f7faf7; box-shadow: 0 30px 60px rgba(18,59,42,.28), inset 0 0 0 1px rgba(255,255,255,.2); }
+    .phone::before { content: ""; position: absolute; z-index: 10; top: 7px; left: 50%; width: 98px; height: 20px; border-radius: 12px; background: #15362b; transform: translateX(-50%); }
+    .phone-status { position: absolute; z-index: 11; top: 11px; right: 22px; color: #e7f2e9; font-size: 8px; font-weight: 800; }
+    .phone-screen { display: none; height: 100%; overflow: auto; padding: 38px 14px 82px; scrollbar-width: none; }
+    .phone-screen::-webkit-scrollbar { display: none; }
+    .phone-screen.active { display: block; animation: lift .25s ease both; }
+    .mini-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .mini-brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .mini-logo { display: block; flex: 0 0 auto; width: 43px; height: 32px; object-fit: contain; }
+    .mini-location { color: #618273; font-size: 9px; }
+    .mini-location b { display: block; margin-top: 3px; color: #194a36; font-size: 15px; letter-spacing: -.05em; }
+    .mini-avatar { display: grid; place-items: center; width: 28px; height: 28px; color: #fff; border-radius: 50%; background: #5aa37b; font-size: 10px; }
+    .resident-hero { position: relative; overflow: hidden; padding: 16px; color: #eff8f1; background: linear-gradient(145deg,#28674b,#174c3a); border-radius: 16px; }
+    .resident-hero::after { content: ""; position: absolute; width: 110px; height: 110px; right: -46px; top: -48px; border: 14px solid rgba(185,230,111,.18); border-radius: 50%; }
+    .resident-hero small { position: relative; color: #c6ddcd; font-size: 9px; }
+    .resident-hero strong { position: relative; display: block; width: 195px; margin: 8px 0 5px; color: #fff; font-size: 16px; line-height: 1.35; letter-spacing: -.04em; }
+    .resident-hero span { position: relative; display: inline-flex; padding: 5px 7px; border-radius: 99px; color: #d9f1df; background: rgba(255,255,255,.09); font-size: 8px; }
+    .mini-section-head { display: flex; align-items: center; justify-content: space-between; margin: 18px 1px 9px; }
+    .mini-section-head b { color: #244b39; font-size: 11px; }
+    .mini-section-head span { color: #6fa47d; font-size: 9px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .quick-service { min-height: 69px; padding: 9px 5px; color: #496c5a; background: #fff; border: 1px solid #e4ede5; border-radius: 12px; text-align: center; font-size: 9px; }
+    .quick-service i { display: grid; place-items: center; width: 24px; height: 24px; margin: 0 auto 5px; color: #367e59; border-radius: 8px; background: #e8f4e9; font-style: normal; font-size: 12px; }
+    .quick-service:hover { background: #eff8f0; border-color: #b9dbc0; }
+    .mini-service-card { display: flex; align-items: center; gap: 9px; padding: 11px; color: #fff; background: #fff; border: 1px solid #e4ede5; border-radius: 12px; }
+    .service-progress-icon { display: grid; place-items: center; width: 33px; height: 33px; color: #837044; border-radius: 9px; background: #fff2d6; font-size: 14px; }
+    .mini-service-card strong { display: block; color: #365c4a; font-size: 10px; }
+    .mini-service-card small { display: block; margin-top: 3px; color: #8ba095; font-size: 8px; }
+    .mini-service-card .status { margin-left: auto; font-size: 8px; }
+    .notice-mini { padding: 11px; border-radius: 12px; background: #fff; border: 1px solid #e4ede5; }
+    .notice-mini small { display: block; margin-bottom: 3px; color: #cd795f; font-size: 8px; font-weight: 800; }
+    .notice-mini b { display: block; color: #385f4c; font-size: 10px; }
+    .notice-mini span { display: block; margin-top: 4px; color: #859a8e; font-size: 8px; }
+    .phone-nav { position: absolute; z-index: 7; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around; padding: 9px 8px 12px; background: rgba(255,255,255,.96); border-top: 1px solid #e5eee6; }
+    .phone-nav button { display: grid; gap: 4px; place-items: center; color: #84988d; background: transparent; border: 0; font-size: 8px; }
+    .phone-nav button b { color: #6d8779; font-size: 13px; line-height: 1; }
+    .phone-nav button.active { color: #277a53; font-weight: 800; }
+    .phone-nav button.active b { color: #277a53; }
+    .back-button { display: inline-flex; align-items: center; gap: 4px; padding: 0; margin: 0 0 13px; color: #5b876e; background: none; border: 0; font-size: 9px; font-weight: 800; }
+    .form-title { color: #234b39; font-size: 17px; letter-spacing: -.05em; }
+    .form-helper { margin: -5px 0 16px; color: #80958a; font-size: 9px; line-height: 1.5; }
+    .form-label { display: block; margin: 13px 0 6px; color: #52705f; font-size: 9px; font-weight: 800; }
+    .choice-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .choice-row button { padding: 6px 8px; color: #678173; background: #fff; border: 1px solid #dfe9e1; border-radius: 99px; font-size: 8px; }
+    .choice-row button.active { color: #2d7752; background: #eaf6ec; border-color: #9dd3ac; font-weight: 800; }
+    .fake-input, .fake-textarea { width: 100%; color: #72897c; background: #fff; border: 1px solid #dfe9e1; border-radius: 10px; font-size: 9px; }
+    .fake-input { height: 33px; padding: 10px; }
+    .fake-textarea { height: 63px; padding: 10px; line-height: 1.5; resize: none; }
+    .upload-box { display: flex; align-items: center; justify-content: center; gap: 7px; height: 46px; color: #57916e; border: 1px dashed #afd0b5; border-radius: 10px; background: #f6fbf6; font-size: 9px; }
+    .submit-repair { width: 100%; min-height: 38px; margin-top: 17px; color: #14362a; background: var(--lime); border: 1px solid #add96b; border-radius: 11px; font-size: 11px; font-weight: 850; }
+    .progress-intro { padding: 15px; color: #e8f4ea; background: linear-gradient(145deg,#28694c,#174a39); border-radius: 15px; }
+    .progress-intro small { color: #c8e0cf; font-size: 8px; }
+    .progress-intro b { display: block; margin: 7px 0 3px; color: #fff; font-size: 13px; }
+    .progress-intro span { font-size: 9px; color: #d6eadb; }
+    .resident-timeline { margin: 20px 0 0 10px; padding-left: 20px; border-left: 1px solid #d8e7db; }
+    .resident-timeline .r-step { position: relative; padding: 0 4px 19px; color: #799084; font-size: 9px; line-height: 1.45; }
+    .resident-timeline .r-step::before { content: ""; position: absolute; width: 10px; height: 10px; top: 0; left: -26px; border: 3px solid #edf6ef; border-radius: 50%; background: #67b380; box-shadow: 0 0 0 1px #84c397; }
+    .resident-timeline .r-step.waiting::before { background: #f2bb57; box-shadow: 0 0 0 1px #f2bb57; }
+    .resident-timeline b { display: block; color: #345c49; font-size: 10px; }
+    .resident-timeline small { display: block; margin-top: 3px; color: #83998d; font-size: 8px; }
+    .resident-timeline .tag-time { display: inline-block; margin-top: 4px; padding: 3px 5px; border-radius: 4px; color: #8c7336; background: #fff5db; font-size: 8px; }
+    .confirm-box { margin-top: 4px; padding: 11px; border-radius: 11px; background: #fff; border: 1px solid #e0eae1; }
+    .confirm-box b { display: block; color: #375e4a; font-size: 10px; }
+    .confirm-box span { display: block; margin: 5px 0 9px; color: #869a8f; font-size: 8px; }
+    .confirm-actions { display: flex; gap: 7px; }
+    .confirm-actions button { flex: 1; padding: 7px; border-radius: 8px; font-size: 8px; font-weight: 800; }
+    .confirm-actions .yes { color: #234e38; background: var(--lime); border: 1px solid #b0dc6c; }
+    .confirm-actions .no { color: #b16552; background: #fff0eb; border: 1px solid #ffd8ce; }
+
+    .toast { position: fixed; z-index: 99; bottom: 22px; left: 50%; max-width: calc(100vw - 32px); padding: 11px 15px; color: #eaf6ed; background: rgba(15,48,36,.94); border: 1px solid rgba(185,230,111,.3); border-radius: 10px; box-shadow: 0 12px 28px rgba(13,44,32,.22); font-size: 11px; transform: translate(-50%, 90px); opacity: 0; transition: .28s ease; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    .click-hint { position: absolute; right: 15px; bottom: 12px; color: #8ca297; font-size: 9px; }
+
+    .workflow-panel {
+      margin-bottom: 12px;
+      padding: 15px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      box-shadow: 0 4px 14px rgba(34,77,57,.035);
+    }
+    .workflow-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .workflow-title span { color: #193d2f; font-size: 13px; font-weight: 850; }
+    .workflow-title em { color: #7b9287; font-size: 9px; font-style: normal; font-weight: 750; }
+    .workflow-steps { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+    .workflow-step {
+      min-height: 92px;
+      padding: 11px 10px;
+      color: #5f786b;
+      background: #f7faf7;
+      border: 1px solid #e3ece4;
+      border-radius: 12px;
+    }
+    .workflow-step b { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; margin-bottom: 9px; color: #224b39; background: var(--lime); border-radius: 8px; font-size: 10px; }
+    .workflow-step strong { display: block; margin-bottom: 5px; color: #2d5644; font-size: 10px; }
+    .workflow-step span { display: block; color: #7e958a; font-size: 9px; line-height: 1.5; }
+    .single-role .hero, .single-role .role-switcher { display: none; }
+    .single-role .topbar { margin-bottom: 18px; }
+    .single-role .page-shell { padding-top: 20px; }
+    .single-role .page-shell::after { display: none; }
+    .single-role .prototype { min-height: auto; }
+    body.single-role .page-shell { min-height: 100dvh; padding: 0; background: var(--mist); }
+    body.single-role .topbar { width: 100%; min-height: 68px; padding: 8px clamp(16px, 3vw, 38px); background: var(--paper); border-bottom: 1px solid var(--line); }
+    body.single-role .prototype { width: 100%; min-height: calc(100dvh - 68px); margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+    body.single-role .role-view.active { min-height: calc(100dvh - 68px); }
+    body.single-role .resident-view.role-view.active { display: block; }
+    body.single-role .resident-layout { grid-template-columns: minmax(0, 1fr); min-height: calc(100dvh - 68px); max-width: 980px; margin: 0 auto; padding: clamp(18px, 4vw, 52px); }
+    body.single-role .resident-copy { display: none; }
+    body.single-role .phone-wrap { width: 100%; }
+    body.single-role .phone { width: 100%; max-width: none; height: calc(100dvh - 68px); min-height: 520px; border: 0; border-radius: 0; box-shadow: none; }
+    body.single-role .phone::before, body.single-role .phone-status { display: none; }
+
+    @media (max-width: 1120px) {
+      .metric-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .workflow-steps { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .content-grid, .service-overview, .repairs-layout, .journal-layout, .columns-layout { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .role-view.active { grid-template-columns: 205px minmax(0,1fr); }
+      .resident-layout { grid-template-columns: 1fr 360px; }
+    }
+    @media (max-width: 800px) {
+      .page-shell { padding: 17px 12px 38px; }
+      .hero { grid-template-columns: 1fr; margin: 35px auto 22px; }
+      .loop-note { max-width: 570px; }
+      .role-switcher { gap: 5px; padding: 5px; }
+      .role-button { flex-basis: 30%; min-height: 42px; padding: 7px 5px; font-size: 11px; }
+      .prototype { border-radius: 18px; }
+      .role-view.active { display: block; min-height: auto; }
+      .sidebar { display: none; }
+      .workarea { padding: 20px 14px 30px; }
+      .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .workflow-steps { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .metric-card:last-child { grid-column: span 2; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .resident-layout { grid-template-columns: 1fr; min-height: auto; padding: 31px 18px 42px; }
+      .resident-copy { text-align: left; }
+      .phone-wrap { margin-top: 0; }
+      .phone { width: min(100%, 350px); }
+      .click-hint { display: none; }
+    }
+    @media (max-width: 460px) {
+      .topbar { align-items: flex-start; }
+      .prototype-label { padding: 7px 9px; font-size: 10px; }
+      h1 { font-size: 35px; }
+      .workbar { align-items: flex-end; }
+      .workbar-actions .subtle-button { display: none; }
+      .metric-grid { gap: 8px; }
+      .workflow-title { display: block; }
+      .workflow-title em { display: block; margin-top: 4px; }
+      .workflow-steps { grid-template-columns: 1fr; }
+      .metric-card { min-height: 105px; padding: 13px; }
+      .metric-value { font-size: 21px; }
+      .material-stream { padding: 0 12px 12px; }
+      .material-piece { min-height: 87px; padding: 10px 7px; }
+      .ai-summary { grid-template-columns: 1fr; }
+      .queue-row { grid-template-columns: 22px minmax(0,1fr) 58px; }
+      .queue-row .queue-person { display: none; }
+      .repair-header, .repair-item { grid-template-columns: 74px minmax(0,1fr) 62px; }
+      .repair-header > :nth-child(3), .repair-item > :nth-child(3) { display: none; }
+      .phone { height: 630px; }
+    }
+  </style>
+</head>
+<body data-default-role="resident" data-single-role="true">
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand"><img class="brand-logo" src="声边-logo-透明-简化.png" alt="声边 Voice Here" /><span class="brand-name">声边</span></div>
+      <div class="prototype-label"><i class="pulse"></i>可点击原型 · V0.1</div>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">SHENGBIAN · COMMUNITY SERVICE OS</p>
+        <h1 id="hero-title">让物业服务<br /><em>被居民看见</em></h1>
+        <p class="hero-copy">一个连接声边总运营、物业项目与居民的小程序服务闭环。点击下方角色，体验三端如何把真实工作沉淀为内容、服务与可行动的数据。</p>
+      </div>
+      <aside class="loop-note" aria-label="声边服务闭环">
+        <small>声边的核心闭环</small>
+        <div class="loop-path"><span>内容</span><b>→</b><span>服务</span><b>→</b><span>数据</span><b>→</b><span>AI 分析</span><b>→</b><span>内容</span></div>
+      </aside>
+    </section>
+
+    <nav class="role-switcher" aria-label="选择体验角色">
+      <button class="role-button active" data-role="platform" type="button"><span class="role-icon">◎</span>声边创始人 / 总运营</button>
+      <button class="role-button" data-role="property" type="button"><span class="role-icon">▦</span>小区项目经理 / 物业客服</button>
+      <button class="role-button" data-role="resident" type="button"><span class="role-icon">⌂</span>小区居民 / 小程序端</button>
+    </nav>
+
+    <main class="prototype" aria-live="polite">
+      <div class="app-ambient"></div>
+
+      <!-- 平台总运营 -->
+      <section class="role-view active" id="platform-view" data-role-view="platform" aria-label="平台总运营后台">
+        <aside class="sidebar">
+          <div class="side-brand"><img class="brand-logo" src="声边-logo-透明-简化.png" alt="" />声边总后台</div>
+          <div class="side-project"><small>当前运营范围</small><strong>全部合作小区 <span>⌄</span></strong></div>
+          <div class="nav-group">
+            <span class="nav-label">运营总览</span>
+            <button class="nav-item active" data-screen-target="platform-overview" type="button"><span class="nav-symbol">▦</span>平台驾驶舱</button>
+            <button class="nav-item" data-screen-target="platform-projects" type="button"><span class="nav-symbol">⌂</span>合作小区 <span class="nav-count">28</span></button>
+          </div>
+          <div class="nav-group">
+            <span class="nav-label">内容与智能</span>
+            <button class="nav-item" data-screen-target="platform-columns" type="button"><span class="nav-symbol">✦</span>声边栏目中心</button>
+            <button class="nav-item" data-screen-target="platform-ai" type="button"><span class="nav-symbol">◌</span>AI 分析中心 <span class="nav-count">7</span></button>
+            <button class="nav-item" data-screen-target="platform-columns" type="button"><span class="nav-symbol">▣</span>内容审核 <span class="nav-count">12</span></button>
+          </div>
+          <div class="nav-group">
+            <span class="nav-label">平台管理</span>
+            <button class="nav-item" type="button" data-toast="客户与服务费管理：已汇总 6 个即将到期项目">◈　客户与服务费</button>
+            <button class="nav-item" type="button" data-toast="平台数据已同步至今天 18:00">▤　数据报表</button>
+          </div>
+          <div class="side-user"><span class="avatar">林</span><span>林雨<br /><small>平台总运营</small></span></div>
+        </aside>
+
+        <div class="workarea">
+          <div class="screen active" id="platform-overview">
+            <header class="workbar">
+              <div><p class="eyebrow">MONDAY · 18 AUG 2026</p><h2>声边平台总览 <span>实时</span></h2></div>
+              <div class="workbar-actions"><button class="subtle-button" type="button" data-toast="正在生成今日平台简报…">↗ 今日简报</button><button class="primary-button" type="button" data-screen-jump="platform-columns">✦ 创建内容</button></div>
+            </header>
+            <section class="workflow-panel" aria-label="声边总运营端操作步骤">
+              <div class="workflow-title"><span>总运营端操作步骤</span><em>从平台总览到跨小区复盘</em></div>
+              <div class="workflow-steps">
+                <div class="workflow-step"><b>01</b><strong>查看全局数据</strong><span>进入平台驾驶舱，确认合作小区、居民活跃、缴费与工单概况。</span></div>
+                <div class="workflow-step"><b>02</b><strong>识别重点项目</strong><span>依据风险、上传资料和服务效率，定位需要跟进的小区。</span></div>
+                <div class="workflow-step"><b>03</b><strong>进入 AI 分析</strong><span>把重复反馈、超时工单和高频词合并成可处理事项。</span></div>
+                <div class="workflow-step"><b>04</b><strong>生成内容栏目</strong><span>把项目素材转成物业周记、公告或跨小区统一选题。</span></div>
+                <div class="workflow-step"><b>05</b><strong>分派并复盘</strong><span>向项目经理发送任务，沉淀营收、满意度和内容数据。</span></div>
+              </div>
+            </section>
+            <div class="metric-grid">
+              <article class="metric-card"><span class="metric-label">合作物业公司</span><b class="metric-value">06</b><span class="metric-meta"><b class="up">+1</b> 本季度新签</span><i class="metric-icon">◉</i></article>
+              <article class="metric-card"><span class="metric-label">合作小区</span><b class="metric-value">28</b><span class="metric-meta">覆盖 <b>18,426</b> 户</span><i class="metric-icon">⌂</i></article>
+              <article class="metric-card"><span class="metric-label">居民活跃人数</span><b class="metric-value">6,842</b><span class="metric-meta"><b class="up">+12.4%</b> 较上周</span><i class="metric-icon">◌</i></article>
+              <article class="metric-card"><span class="metric-label">今日总营收</span><b class="metric-value">¥36.8<span style="font-size:14px">万</span></b><span class="metric-meta">物业费 + 停车费</span><i class="metric-icon">¥</i></article>
+              <article class="metric-card urgent"><span class="metric-label">待重点关注</span><b class="metric-value">07</b><span class="metric-meta"><b class="warn">3 项风险预警</b></span><i class="metric-icon" style="color:#dc8069">!</i></article>
+            </div>
+            <div class="content-grid">
+              <div>
+                <section class="card">
+                  <div class="card-head"><h3>今日业务运行</h3><button class="linkish" type="button" data-toast="已切换至全平台数据报表">查看全部 ↗</button></div>
+                  <div class="bar-row"><span>物业费缴费</span><div class="bar"><i style="width:76%"></i></div><b>¥24.6万</b></div>
+                  <div class="bar-row"><span>停车费缴费</span><div class="bar"><i style="width:45%; background:linear-gradient(90deg,#7bb9dd,#b0dff0)"></i></div><b>¥12.2万</b></div>
+                  <div class="bar-row"><span>新增报修</span><div class="bar"><i style="width:67%; background:linear-gradient(90deg,#f0ba55,#f5d47e)"></i></div><b>146 单</b></div>
+                  <div class="bar-row"><span>已完成工单</span><div class="bar"><i style="width:82%"></i></div><b>121 单</b></div>
+                  <div class="bar-row"><span>项目上传素材</span><div class="bar"><i style="width:59%; background:linear-gradient(90deg,#9e8ed0,#c8b8e7)"></i></div><b>382 份</b></div>
+                  <div class="chart-foot"><span>今日 00:00 — 18:00</span><span>数据每 5 分钟同步</span></div>
+                </section>
+                <section class="card material-card">
+                  <div class="card-head"><h3>今日上传资料</h3><button class="linkish" type="button" data-screen-jump="platform-columns">进入物业周记 →</button></div>
+                  <div class="material-stream">
+                    <div class="material-piece"><span class="mini-icon">▧</span><strong>工作图片</strong><small>268 张 · 23 个项目</small></div>
+                    <div class="material-piece"><span class="mini-icon">▷</span><strong>工作视频</strong><small>48 条 · 16 个项目</small></div>
+                    <div class="material-piece"><span class="mini-icon">✎</span><strong>文字与计划</strong><small>66 份 · 12 篇待生成</small></div>
+                  </div>
+                </section>
+              </div>
+              <section class="card">
+                <div class="card-head"><h3>AI 今日提醒</h3><button class="linkish" type="button" data-screen-jump="platform-ai">分析中心 →</button></div>
+                <div class="alert-list">
+                  <div class="alert-item"><i class="alert-dot high"></i><div><strong>彭一小区电梯反馈增加 40%</strong><span>近 7 天居民反馈 14 条，建议专项查看</span></div><em class="alert-tag">风险</em></div>
+                  <div class="alert-item"><i class="alert-dot high"></i><div><strong>新港花园有 3 张超时工单</strong><span>最长已等待 31 小时，涉及公共照明</span></div><em class="alert-tag">风险</em></div>
+                  <div class="alert-item"><i class="alert-dot"></i><div><strong>金悦府两周未提交工作素材</strong><span>可能影响本周物业周记生产</span></div><em class="alert-tag watch">关注</em></div>
+                  <div class="alert-item"><i class="alert-dot"></i><div><strong>停车问题成为 4 个小区高频词</strong><span>可形成《停车秩序说明》统一栏目</span></div><em class="alert-tag watch">选题</em></div>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="screen" id="platform-ai">
+            <header class="workbar"><div><p class="eyebrow">INTELLIGENCE · SIGNALS</p><h2>AI 分析中心 <span>本周 07 项</span></h2></div><div class="workbar-actions"><button class="subtle-button" type="button" data-toast="本周分析报告已生成，可供导出">⇩ 导出周报</button><button class="primary-button" type="button" data-toast="已将 3 个风险事项指派给对应项目">分派关注事项</button></div></header>
+            <div class="ai-summary">
+              <article class="signal-card risk"><small>风险预警 · 03</small><strong>彭一小区电梯相关投诉上升</strong><span>较上周 +40%，集中于 3、16 号楼</span><i class="signal-number">03</i></article>
+              <article class="signal-card watch"><small>需要关注 · 04</small><strong>停车与楼道照明出现重复问题</strong><span>14 天内共出现 12 次相似描述</span><i class="signal-number">04</i></article>
+              <article class="signal-card good"><small>正常运行 · 21</small><strong>多数项目服务效率保持稳定</strong><span>平均工单首次响应 17 分钟</span><i class="signal-number">21</i></article>
+            </div>
+            <div class="content-grid">
+              <section class="card"><div class="card-head"><h3>本周重点洞察</h3><button class="linkish" type="button" data-toast="洞察已按项目负责人分组">按项目查看 ↗</button></div>
+                <div class="insight-list">
+                  <div class="insight-row"><span class="insight-index">01</span><div><strong>彭一小区「电梯」居民反馈较上周增加 40%</strong><small>涉及 3 号、16 号楼；居民留言情绪偏焦急</small></div><span class="severity r">风险预警</span></div>
+                  <div class="insight-row"><span class="insight-index">02</span><div><strong>滨江家园出现 5 次相同的楼道照明问题</strong><small>AI 建议合并为公共设备专项，追踪彻底解决率</small></div><span class="severity w">需关注</span></div>
+                  <div class="insight-row"><span class="insight-index">03</span><div><strong>新港花园平均报修处理时间高于项目均值</strong><small>平均 6.8 小时，平台中位数为 3.2 小时</small></div><span class="severity w">需关注</span></div>
+                  <div class="insight-row"><span class="insight-index">04</span><div><strong>金悦府居民满意度连续两周回升</strong><small>物业周记阅读完成率 68%，可作为优秀项目案例</small></div><span class="severity g">正常</span></div>
+                </div>
+              </section>
+              <section class="card"><div class="card-head"><h3>AI 建议动作</h3></div><div class="alert-list">
+                <div class="alert-item"><i class="alert-dot high"></i><div><strong>发起电梯专项追踪</strong><span>关联现有 14 条反馈，设定 48 小时节点</span></div><button class="linkish" type="button" data-toast="已创建「彭一电梯专项」">执行</button></div>
+                <div class="alert-item"><i class="alert-dot"></i><div><strong>生成停车秩序统一选题</strong><span>适用于 4 个停车问题高频小区</span></div><button class="linkish" type="button" data-screen-jump="platform-columns">生成</button></div>
+                <div class="alert-item"><i class="alert-dot"></i><div><strong>提醒金悦府上传素材</strong><span>已连续 14 天未上传周度工作记录</span></div><button class="linkish" type="button" data-toast="提醒已发送给金悦府项目经理">提醒</button></div>
+              </div></section>
+            </div>
+          </div>
+
+          <div class="screen" id="platform-projects">
+            <header class="workbar"><div><p class="eyebrow">PROJECT PORTFOLIO</p><h2>合作小区 <span>28 个项目</span></h2></div><div class="workbar-actions"><button class="subtle-button" type="button" data-toast="当前按风险等级排序">⇅ 风险优先</button><button class="primary-button" type="button" data-toast="新合作小区建档流程已打开">＋ 新增项目</button></div></header>
+            <div class="projects-grid">
+              <article class="project-card"><div class="project-card-top"><b>彭一小区</b><span class="severity r">风险 2</span></div><small>上海 · 浦东新区 · 浦发物业</small><div class="project-stat"><div><strong>2,384</strong><span>认证居民</span></div><div><strong>92.6%</strong><span>本月缴费率</span></div></div><div class="project-footer"><span>今日 18 个素材</span><button class="linkish" type="button" data-role-open="property">进入驾驶舱 →</button></div></article>
+              <article class="project-card"><div class="project-card-top"><b>滨江家园</b><span class="severity w">关注 1</span></div><small>上海 · 徐汇区 · 浦发物业</small><div class="project-stat"><div><strong>1,958</strong><span>认证居民</span></div><div><strong>95.1%</strong><span>本月缴费率</span></div></div><div class="project-footer"><span>今日 25 个素材</span><button class="linkish" type="button" data-toast="已进入滨江家园数据档案">查看项目 →</button></div></article>
+              <article class="project-card"><div class="project-card-top"><b>金悦府</b><span class="severity w">待跟进</span></div><small>上海 · 闵行区 · 安居服务</small><div class="project-stat"><div><strong>1,415</strong><span>认证居民</span></div><div><strong>89.7%</strong><span>本月缴费率</span></div></div><div class="project-footer"><span>14 天未上传素材</span><button class="linkish" type="button" data-toast="已打开金悦府项目待办">查看项目 →</button></div></article>
+              <article class="project-card"><div class="project-card-top"><b>新港花园</b><span class="severity r">超时 3</span></div><small>上海 · 杨浦区 · 华景物业</small><div class="project-stat"><div><strong>2,126</strong><span>认证居民</span></div><div><strong>93.4%</strong><span>本月缴费率</span></div></div><div class="project-footer"><span>8 单待第三方</span><button class="linkish" type="button" data-toast="已打开新港花园工单看板">查看项目 →</button></div></article>
+              <article class="project-card"><div class="project-card-top"><b>望江名邸</b><span class="severity g">正常</span></div><small>上海 · 浦东新区 · 华景物业</small><div class="project-stat"><div><strong>1,782</strong><span>认证居民</span></div><div><strong>97.8%</strong><span>本月缴费率</span></div></div><div class="project-footer"><span>本周阅读 +22%</span><button class="linkish" type="button" data-toast="已打开望江名邸项目数据">查看项目 →</button></div></article>
+              <article class="project-card"><div class="project-card-top"><b>嘉和苑</b><span class="severity g">正常</span></div><small>上海 · 普陀区 · 安居服务</small><div class="project-stat"><div><strong>1,246</strong><span>认证居民</span></div><div><strong>96.3%</strong><span>本月缴费率</span></div></div><div class="project-footer"><span>本周 2 篇已发布</span><button class="linkish" type="button" data-toast="已打开嘉和苑项目数据">查看项目 →</button></div></article>
+            </div>
+          </div>
+
+          <div class="screen" id="platform-columns">
+            <header class="workbar"><div><p class="eyebrow">CONTENT STUDIO · ONE TO MANY</p><h2>声边栏目中心 <span>12 篇待审核</span></h2></div><div class="workbar-actions"><button class="subtle-button" type="button" data-toast="正在打开统一内容排期">▦ 内容日历</button><button class="primary-button" type="button" data-toast="已创建空白栏目草稿">＋ 新建栏目</button></div></header>
+            <div class="columns-layout">
+              <div>
+                <section class="column-hero"><small>统一节目 / 跨小区发布</small><h3>夏季防暑指南</h3><p>上传一次，选择受众后同步到各小区首页或相应栏目。支持按区域、物业公司、指定小区进行分发。</p><div class="audience-pills"><span>全部合作小区 · 28</span><span>上海区域 · 18</span><span>浦发物业 · 8</span><span>指定小区</span></div></section>
+                <section class="card" style="margin-top:12px"><div class="card-head"><h3>物业周记 · AI 生产链路</h3><button class="linkish" type="button" data-role-open="property">进入项目端 →</button></div><div class="production-flow"><div class="flow-node"><b>▧</b><span>原始素材</span></div><i class="flow-arrow">→</i><div class="flow-node"><b>◌</b><span>AI 分析</span></div><i class="flow-arrow">→</i><div class="flow-node"><b>✎</b><span>文章初稿</span></div><i class="flow-arrow">→</i><div class="flow-node"><b>✓</b><span>人工审核</span></div><i class="flow-arrow">→</i><div class="flow-node"><b>↗</b><span>发布</span></div></div></section>
+              </div>
+              <section class="card"><div class="card-head"><h3>等待审核</h3><button class="linkish" type="button" data-toast="已切换到全部待审核队列">12 篇</button></div><div class="publish-list">
+                <div class="publish-row"><i class="cover"></i><div><strong>彭一小区 · 物业周记</strong><small>AI 已完成排版 · 18 张图</small></div><span class="severity w">待审核</span></div>
+                <div class="publish-row"><i class="cover" style="background:linear-gradient(135deg,#efc66c,#df8d69)"></i><div><strong>夏季防暑指南</strong><small>统一栏目 · 覆盖 28 个小区</small></div><span class="severity w">待审核</span></div>
+                <div class="publish-row"><i class="cover" style="background:linear-gradient(135deg,#8eb8e2,#cbe5e8)"></i><div><strong>滨江家园 · 小区发布</strong><small>停水施工通知 · AI 润色</small></div><span class="severity w">待审核</span></div>
+                <div class="publish-row"><i class="cover" style="background:linear-gradient(135deg,#a98bd0,#e4c4d6)"></i><div><strong>社区活动 · 邻里旧书市集</strong><small>来自居民投稿 · 1 个小区</small></div><span class="severity g">可发布</span></div>
+              </div></section>
+            </div>
+          </div>
+        </div>
+        <span class="click-hint">点击侧栏切换功能视图</span>
+      </section>
+
+      <!-- 物业项目端 -->
+      <section class="role-view" id="property-view" data-role-view="property" aria-label="小区物业工作台">
+        <aside class="sidebar">
+          <div class="side-brand"><img class="brand-logo" src="声边-logo-透明-简化.png" alt="" />声边物业端</div>
+          <div class="side-project"><small>当前管理项目</small><strong>彭一小区 <span>⌄</span></strong></div>
+          <div class="nav-group"><span class="nav-label">今日工作</span>
+            <button class="nav-item active" data-screen-target="property-overview" type="button"><span class="nav-symbol">▦</span>运营工作台</button>
+            <button class="nav-item" data-screen-target="property-repairs" type="button"><span class="nav-symbol">⌕</span>报修管理 <span class="nav-count">18</span></button>
+            <button class="nav-item" type="button" data-toast="投诉建议：2 条待回复，1 条表扬">♡　居民反馈 <span class="nav-count">3</span></button>
+          </div>
+          <div class="nav-group"><span class="nav-label">居民与收费</span>
+            <button class="nav-item" type="button" data-toast="小区业主：已认证 2,384 人">◎　小区业主</button>
+            <button class="nav-item" type="button" data-toast="本月物业费缴费率为 92.6%">¥　物业缴费</button>
+            <button class="nav-item" type="button" data-toast="42 台车辆将在 7 天内到期">▱　停车缴费</button>
+          </div>
+          <div class="nav-group"><span class="nav-label">内容发布</span>
+            <button class="nav-item" data-screen-target="property-journal" type="button"><span class="nav-symbol">✦</span>物业周记 <span class="nav-count">1</span></button>
+            <button class="nav-item" type="button" data-toast="公告草稿已由 AI 按标准通知格式生成">▤　物业公告</button>
+          </div>
+          <div class="side-user"><span class="avatar">陈</span><span>陈晨<br /><small>彭一小区 · 项目经理</small></span></div>
+        </aside>
+        <div class="workarea">
+          <div class="screen active" id="property-overview">
+            <header class="workbar"><div><p class="eyebrow">PENGYI COMMUNITY · TODAY</p><h2>小区运营工作台 <span>彭一小区</span></h2></div><div class="workbar-actions"><button class="subtle-button" type="button" data-toast="今日交班简报已生成">↗ 今日交班</button><button class="primary-button" type="button" data-screen-jump="property-journal">＋ 上传工作资料</button></div></header>
+            <section class="workflow-panel" aria-label="物业项目端操作步骤">
+              <div class="workflow-title"><span>物业项目端操作步骤</span><em>从今日工作到周记发布</em></div>
+              <div class="workflow-steps">
+                <div class="workflow-step"><b>01</b><strong>查看今日队列</strong><span>先看缴费、报修、居民认证和超时问题，确定优先级。</span></div>
+                <div class="workflow-step"><b>02</b><strong>受理居民工单</strong><span>进入报修管理，核对位置、图片视频、状态和责任人。</span></div>
+                <div class="workflow-step"><b>03</b><strong>分派处理动作</strong><span>分派工程、客服或第三方维保，并记录催办与处理节点。</span></div>
+                <div class="workflow-step"><b>04</b><strong>上传工作资料</strong><span>补充图片、视频、文字总结和下周计划，供 AI 自动归类。</span></div>
+                <div class="workflow-step"><b>05</b><strong>确认内容发布</strong><span>检查 AI 周记草稿和公告文案，提交给声边总后台审核。</span></div>
+              </div>
+            </section>
+            <div class="metric-grid">
+              <article class="metric-card"><span class="metric-label">今日物业费</span><b class="metric-value">¥6.2<span style="font-size:14px">万</span></b><span class="metric-meta">已缴 87 户</span><i class="metric-icon">¥</i></article>
+              <article class="metric-card"><span class="metric-label">今日停车费</span><b class="metric-value">¥1.8<span style="font-size:14px">万</span></b><span class="metric-meta">已缴 31 辆</span><i class="metric-icon">▱</i></article>
+              <article class="metric-card"><span class="metric-label">新增报修</span><b class="metric-value">18</b><span class="metric-meta">其中公共区域 9 单</span><i class="metric-icon">⌕</i></article>
+              <article class="metric-card urgent"><span class="metric-label">超时 / 不满意</span><b class="metric-value">03</b><span class="metric-meta"><b class="warn">需要优先回访</b></span><i class="metric-icon" style="color:#dc8069">!</i></article>
+              <article class="metric-card"><span class="metric-label">新增居民</span><b class="metric-value">07</b><span class="metric-meta">3 人等待物业审核</span><i class="metric-icon">◎</i></article>
+            </div>
+            <div class="service-overview">
+              <section class="card"><div class="card-head"><h3>今日服务队列</h3><button class="linkish" type="button" data-screen-jump="property-repairs">进入报修管理 →</button></div><div class="queue">
+                <div class="queue-row"><span class="queue-no">#10248</span><div><strong>16 号楼 2 单元楼道照明不亮</strong><small>公共区域 · 08:22 提交</small></div><span class="queue-person">王师傅</span><span class="status handle">处理中</span></div>
+                <div class="queue-row"><span class="queue-no">#10247</span><div><strong>3 号楼 1 单元电梯异响</strong><small>电梯 · 07:55 提交</small></div><span class="queue-person">电梯维保</span><span class="status third">等待第三方</span></div>
+                <div class="queue-row"><span class="queue-no">#10242</span><div><strong>地下车库排水检查</strong><small>给排水 · 昨日 16:30 提交</small></div><span class="queue-person">李师傅</span><span class="status done">待居民确认</span></div>
+                <div class="queue-row"><span class="queue-no">#10239</span><div><strong>9 号楼门禁识别异常</strong><small>门禁 · 昨日 11:18 提交</small></div><span class="queue-person">待分派</span><span class="status wait">待处理</span></div>
+              </div></section>
+              <div>
+                <section class="upload-score"><small>本周工作资料提交度</small><strong>84%</strong><span>已上传图片 42 张 / 视频 7 条 / 文字总结 1 份</span><div class="score-line"><i></i></div><div class="score-info"><span>距周记生成还差 1 份计划</span><span>截止周五</span></div></section>
+                <section class="card notice-draft"><div class="card-head" style="padding:0"><h3>物业公告</h3><button class="linkish" type="button" data-toast="AI 已为您润色公告，请到物业公告确认发布">AI 帮我润色</button></div><p>只需录入事实：<b>8 月 19 日 9:00–12:00 进行 3 号楼电梯例行检修</b>。</p><button class="outline-button" type="button" data-toast="公告草稿已生成：含标题、时间、注意事项与联系方式">生成公告草稿</button></section>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen" id="property-repairs">
+            <header class="workbar"><div><p class="eyebrow">SERVICE TICKETS · ALL TRACEABLE</p><h2>报修管理 <span>18 个待跟进</span></h2></div><div class="workbar-actions"><button class="subtle-button" type="button" data-toast="工单数据已导出为本周服务报告">⇩ 导出工单</button><button class="primary-button" type="button" data-toast="工单已快速分派给值班客服">＋ 新建工单</button></div></header>
+            <div class="repairs-layout">
+              <section class="card"><div class="card-head"><h3>居民工单</h3><button class="linkish" type="button" data-toast="支持按楼栋、房号、问题类型和时间筛选">筛选⌄</button></div><div class="filter-pills"><button class="active">全部 36</button><button>待处理 8</button><button>处理中 10</button><button>等待第三方 5</button><button>待确认 9</button><button>超时 3</button></div>
+                <div class="repair-table"><div class="repair-header"><span>工单编号</span><span>问题 / 位置</span><span>处理人</span><span>状态</span></div>
+                <div class="repair-item"><span>#10248<small>08:22</small></span><div><strong>楼道照明不亮</strong><small>16 号楼 2 单元 · 公共区域</small></div><span>王师傅</span><span class="status handle">处理中</span></div>
+                <div class="repair-item"><span>#10247<small>07:55</small></span><div><strong>电梯运行异响</strong><small>3 号楼 1 单元 · 电梯</small></div><span>维保单位</span><span class="status third">等待第三方</span></div>
+                <div class="repair-item"><span>#10242<small>昨日</small></span><div><strong>车库排水检查</strong><small>B2 区 · 给排水</small></div><span>李师傅</span><span class="status done">待确认</span></div>
+                <div class="repair-item"><span>#10239<small>昨日</small></span><div><strong>门禁识别异常</strong><small>9 号楼 · 门禁</small></div><span>待分派</span><span class="status wait">待处理</span></div>
+                <div class="repair-item"><span>#10231<small>08/16</small></span><div><strong>楼道堆物清理</strong><small>5 号楼 · 环境卫生</small></div><span>客服回访</span><span class="status bad">不满意</span></div>
+                </div>
+              </section>
+              <aside class="card detail-card"><h3>工单 #10247</h3><p class="detail-title">3 号楼 1 单元电梯运行时有明显异响，居民已上传 1 段视频。</p><span class="status third">等待第三方维保</span><div class="detail-timeline"><div><b>居民已提交</b>今日 07:55 · 图片、视频已留存</div><div><b>物业已受理</b>08:07 · 客服周敏分派至工程部</div><div><b>已联系第三方</b>08:38 · 永达电梯维保承诺 11:00 到场</div><div><b>等待第三方</b>最近一次催办：09:42</div></div><div class="media-dots"><i></i><i></i><i></i></div><button class="primary-button" style="width:100%;margin-top:13px" type="button" data-toast="已向永达电梯发送催办提醒并记录时间">催办并记录</button></aside>
+            </div>
+          </div>
+
+          <div class="screen" id="property-journal">
+            <header class="workbar"><div><p class="eyebrow">WEEKLY JOURNAL · WORK BECOMES CONTENT</p><h2>物业周记 <span>第 33 周</span></h2></div><div class="workbar-actions"><button class="subtle-button" type="button" data-toast="已打开本周素材上传面板">＋ 继续上传</button><button class="primary-button" type="button" data-action="submit-article">提交审核</button></div></header>
+            <div class="journal-layout">
+              <div>
+                <section class="card journal-source"><div class="card-head" style="padding:0 0 11px"><h3>原始素材 · AI 已自动分类</h3><button class="linkish" type="button" data-toast="AI 已识别保洁、工程、绿化与客服等分类">查看分析 →</button></div>
+                  <div class="source-file"><i>▧</i><div><b>地下车库排水检查</b><small>6 张图片 · 已归类：工程 / 给排水</small></div><span>适合周记</span></div>
+                  <div class="source-file"><i>▷</i><div><b>16 号楼公共照明维修</b><small>1 段视频 · 已归类：工程 / 公共区域</small></div><span>重点事件</span></div>
+                  <div class="source-file"><i>▧</i><div><b>夏季绿化养护</b><small>18 张图片 · 已归类：绿化</small></div><span>适合周记</span></div>
+                  <div class="source-file"><i>✎</i><div><b>本周工作总结与下周计划</b><small>文字记录 · 还缺 1 项下周工程计划</small></div><span style="color:#c48938">待补充</span></div>
+                </section>
+                <section class="card" style="margin-top:12px"><div class="card-head"><h3>内容生产进度</h3><button class="linkish" type="button" data-toast="AI 可重新生成标题、摘要和配图建议">重新生成</button></div><div class="stepper"><div class="step done">素材整理</div><div class="step done">重点提炼</div><div class="step done">生成初稿</div><div class="step current">项目确认</div><div class="step">发布</div></div></section>
+              </div>
+              <article class="journal-draft"><small>AI 生成文章初稿 · 可继续编辑</small><h3>这一周，我们把小区的每一处细节放在心上</h3><p>本周，工程团队完成地下车库排水专项检查，并对 16 号楼公共照明进行维修；绿化团队持续开展夏季养护。关于居民关心的电梯问题，物业已联系第三方维保单位并持续跟进…</p><div class="article-stat"><div><b>18</b><span>推荐图片</span></div><div><b>3</b><span>AI 标题备选</span></div><div><b>1</b><span>待补充事项</span></div></div><button class="primary-button" style="width:100%;margin-top:17px" type="button" data-toast="自动排版预览已生成，可交由项目经理和声边审核">查看自动排版</button></article>
+            </div>
+          </div>
+        </div>
+        <span class="click-hint">点击侧栏切换工作场景</span>
+      </section>
+
+      <!-- 居民小程序 -->
+      <section class="role-view resident-view" id="resident-view" data-role-view="resident" aria-label="居民小程序端">
+        <div class="resident-layout">
+          <div class="resident-copy">
+            <p class="eyebrow">RESIDENT MINI PROGRAM</p>
+            <h2>居民看到的，不只是公告；而是服务正在发生。</h2>
+            <p>认证后进入“我的社区”。缴费、报修、进度、公告与社区内容集中在一个熟悉的入口里，居民能清楚地知道物业做了什么、自己的问题走到了哪一步。</p>
+            <div class="resident-benefits"><div class="resident-benefit"><i>✓</i>提交后立即生成服务编号，过程可随时追踪</div><div class="resident-benefit"><i>◌</i>第三方等待、催办记录也对居民透明呈现</div><div class="resident-benefit"><i>✦</i>确认解决与真实评价，沉淀为社区积分和服务数据</div></div>
+            <section class="workflow-panel" aria-label="居民小程序端操作步骤">
+              <div class="workflow-title"><span>居民小程序端操作步骤</span><em>从认证社区到确认服务结果</em></div>
+              <div class="workflow-steps">
+                <div class="workflow-step"><b>01</b><strong>进入我的社区</strong><span>居民完成认证后看到小区服务、公告和声边社区内容。</span></div>
+                <div class="workflow-step"><b>02</b><strong>发起报修</strong><span>选择问题类型，填写位置、描述、图片视频和联系方式。</span></div>
+                <div class="workflow-step"><b>03</b><strong>获得服务编号</strong><span>提交后生成编号，物业收到并在小程序同步受理状态。</span></div>
+                <div class="workflow-step"><b>04</b><strong>追踪处理进度</strong><span>查看物业受理、工程接单、第三方等待和催办记录。</span></div>
+                <div class="workflow-step"><b>05</b><strong>确认并评价</strong><span>处理完成后确认是否解决，未解决会回到处理中继续跟进。</span></div>
+              </div>
+            </section>
+            <aside class="callout"><b>可体验：</b>点击手机中的“我要报修”与“我的进度”，查看从居民提交、物业处理到居民确认的完整服务链路。</aside>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone-shadow"></div>
+            <div class="phone" aria-label="声边居民小程序模拟界面">
+              <div class="phone-status">9:41 ◒ ◔</div>
+              <div class="phone-screen active" id="resident-home">
+                <header class="mini-head"><div class="mini-brand"><img class="mini-logo" src="声边-logo-透明-简化.png" alt="" /><div class="mini-location">我的社区<b>彭一小区</b></div></div><div class="mini-avatar">李</div></header>
+                <section class="resident-hero resident-hero-carousel" id="resident-hero-carousel" aria-label="社区头图轮播"><div class="resident-hero-state"><small>你好，李女士</small><strong>把社区里的每件小事，认真回应。</strong><span>已认证 · 16 号楼 2 单元 502</span></div></section>
+                <div class="mini-section-head"><b>常用物业服务</b><span>全部服务 ›</span></div>
+                <div class="quick-grid">
+                  <button class="quick-service" type="button" data-action="payment-unavailable"><i>¥</i>物业缴费</button>
+                  <button class="quick-service" type="button" data-action="payment-unavailable"><i>▱</i>停车缴费</button>
+                  <button class="quick-service" type="button" data-resident-screen="resident-repair"><i>⌕</i>我要报修</button>
+                  <button class="quick-service" type="button" data-resident-screen="resident-progress"><i>◌</i>我的进度</button>
+                  <button class="quick-service" type="button" data-resident-screen="resident-feedback"><i>♡</i>投诉建议</button>
+                  <button class="quick-service" type="button" data-resident-screen="resident-points"><i>✦</i>我的积分</button>
+                </div>
+                <div class="mini-section-head"><b>我的服务进度</b><button class="linkish" type="button" data-resident-screen="resident-progress">查看全部 ›</button></div>
+                <button class="mini-service-card" type="button" data-resident-screen="resident-progress"><i class="service-progress-icon">◌</i><div><strong>16 号楼公共照明维修</strong><small>物业已联系第三方维保 · 09:42 催办</small></div><span class="status third">等待第三方</span></button>
+                <section class="resident-carousel" id="resident-carousel" aria-label="物业公告和声边栏目图片链接"><div class="resident-content-state"><b>声边栏目</b><span>正在加载社区精选…</span></div></section>
+              </div>
+
+              <div class="phone-screen" id="resident-repair">
+                <button class="back-button" type="button" data-resident-screen="resident-home">‹ 返回我的社区</button>
+                <h3 class="form-title">我要报修</h3><p class="form-helper">请留下清楚的描述与位置。物业收到后会通过小程序告知您的工单进度。</p>
+                <label class="form-label">问题类型</label><div class="choice-row"><button class="active">公共区域</button><button>电梯</button><button>照明</button><button>给排水</button><button>门禁</button><button>其他</button></div>
+                <label class="form-label">发生位置</label><input class="fake-input" value="16 号楼 2 单元 1 层楼道" readonly />
+                <label class="form-label">问题描述</label><textarea class="fake-textarea" readonly>楼道照明不亮，晚上经过时看不清台阶，希望尽快处理。</textarea>
+                <label class="form-label">图片 / 视频</label><input class="live-file-input" id="repair-attachments" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple /><small class="upload-helper">最多 3 个文件，每个不超过 2 MB。</small>
+                <label class="form-label">联系方式</label><input class="fake-input" value="138****6272" readonly />
+                <button class="submit-repair" type="button" id="submit-repair" data-action="create-repair">提交报修</button>
+              </div>
+
+              <div class="phone-screen" id="resident-feedback">
+                <button class="back-button" type="button" data-resident-screen="resident-home">‹ 返回我的社区</button>
+                <h3 class="form-title">投诉建议</h3><p class="form-helper">提交后会进入物业客服队列，处理进展会记录在服务系统中。</p>
+                <label class="form-label">类型</label><div class="choice-row feedback-type"><button class="active" data-feedback-type="suggestion">建议</button><button data-feedback-type="complaint">投诉</button><button data-feedback-type="praise">表扬</button></div>
+                <label class="form-label">主题</label><input class="fake-input" id="feedback-subject" placeholder="例如：希望增加晚间巡逻" />
+                <label class="form-label">详细内容</label><textarea class="fake-textarea" id="feedback-body" placeholder="请描述具体情况，至少 5 个字"></textarea>
+                <button class="submit-repair" type="button" data-action="submit-feedback">提交反馈</button><section class="resident-feedback-history" id="resident-feedback-history"></section>
+              </div>
+
+              <div class="phone-screen" id="resident-content">
+                <button class="back-button" type="button" data-resident-screen="resident-home">‹ 返回我的社区</button>
+                <h3 class="form-title">声边栏目</h3><p class="form-helper">这里展示物业公告和已经通过平台审核的社区栏目，每张图片都可以进入对应链接。</p>
+                <section id="resident-content-feed-screen" class="resident-content-feed"></section>
+              </div>
+
+              <div class="phone-screen" id="resident-progress">
+                <button class="back-button" type="button" data-resident-screen="resident-home">‹ 返回我的社区</button>
+                <h3 class="form-title">我的服务进度</h3><p class="form-helper">服务编号 #SB-20260818-10248</p>
+                <section class="progress-intro"><small>16 号楼 2 单元楼道照明不亮</small><b>物业正在协调处理</b><span>当前：等待第三方维保单位</span></section>
+                <section class="resident-ticket-list" id="resident-ticket-list" aria-label="我的工单列表"></section>
+                <div class="resident-timeline"><div class="r-step"><b>已提交</b><small>今天 08:22 · 您上传了 2 张图片</small></div><div class="r-step"><b>物业已收到</b><small>08:24 · 已生成服务编号</small></div><div class="r-step"><b>已受理</b><small>08:35 · 工程部王师傅接单</small></div><div class="r-step waiting"><b>等待第三方</b><small>09:12 · 物业已联系照明维保单位</small><span class="tag-time">最近一次催办：09:42</span></div><div class="r-step" style="opacity:.55"><b>处理完成</b><small>完成后将邀请您确认并评价</small></div></div>
+                <section class="resident-ticket-attachments" id="resident-ticket-attachments" aria-label="本工单附件"></section>
+                <section class="confirm-box"><b>问题处理完成后，您可以确认结果</b><span>选择“还没有解决”，工单将自动回到处理中。</span><div class="confirm-actions"><button class="yes" type="button" data-action="confirm-resolved">已解决</button><button class="no" type="button" data-action="confirm-reopened">还没有解决</button></div></section>
+                <section class="review-prompt" hidden><b>本次服务已完成</b><span>确认满意后，留下星级和现场感受，获得 20 社区积分。</span><button class="submit-repair" type="button" data-resident-screen="resident-review">去评价并领积分</button></section>
+              </div>
+
+              <div class="phone-screen" id="resident-review">
+                <button class="back-button" type="button" data-resident-screen="resident-progress">‹ 返回服务进度</button>
+                <h3 class="form-title">评价本次服务</h3><p class="form-helper" id="resident-review-ticket">选择已完成的工单后评价</p>
+                <label class="form-label">服务满意度</label><div class="rating-stars" id="resident-rating-stars" role="radiogroup" aria-label="服务满意度"><button type="button" data-score="1" aria-label="1 星">★</button><button type="button" data-score="2" aria-label="2 星">★</button><button type="button" data-score="3" aria-label="3 星">★</button><button type="button" data-score="4" aria-label="4 星">★</button><button type="button" data-score="5" aria-label="5 星">★</button></div>
+                <label class="form-label">评价内容（可选）</label><textarea class="fake-textarea" id="resident-review-body" placeholder="例如：师傅到场及时，维修后楼道已经恢复照明"></textarea>
+                <label class="form-label">现场照片 / 视频（可选）</label><input class="live-file-input" id="review-attachments" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple /><small class="upload-helper">最多 3 个文件，每个不超过 2 MB。提交评价可获得 20 积分。</small>
+                <button class="submit-repair" type="button" id="submit-review">提交评价并领取积分</button>
+              </div>
+
+              <div class="phone-screen" id="resident-points">
+                <button class="back-button" type="button" data-resident-screen="resident-home">‹ 返回我的社区</button>
+                <h3 class="form-title">我的积分</h3><p class="form-helper">参与真实社区服务，积分可以兑换礼品。</p>
+                <section id="resident-points-content" class="resident-points-content"><div class="resident-content-state"><b>积分中心</b><span>正在加载积分和礼品…</span></div></section>
+                <button class="outline-button" type="button" data-contact-phone="021-6808 0228">联系物业</button>
+              </div>
+
+              <nav class="phone-nav"><button class="active" type="button" data-resident-screen="resident-home"><b>⌂</b>社区</button><button type="button" data-resident-screen="resident-content"><b>✦</b>声边</button><button type="button" data-resident-screen="resident-progress"><b>◌</b>服务</button><button type="button" data-resident-screen="resident-points"><b>◎</b>我的</button></nav>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const toast = document.getElementById('toast');
+    const roleLabels = {
+      platform: '声边创始人 / 总运营',
+      property: '小区项目经理 / 物业客服',
+      resident: '小区居民 / 小程序端'
+    };
+    const roleFiles = {
+      platform: 'shengbian-platform-demo.html',
+      property: 'shengbian-property-demo.html',
+      resident: 'shengbian-resident-demo.html'
+    };
+    let toastTimer;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2900);
+    }
+
+    function switchRole(role) {
+      const lockedRole = document.body.dataset.singleRole === 'true' ? document.body.dataset.defaultRole : '';
+      if (lockedRole && role !== lockedRole) {
+        window.location.href = roleFiles[role] || window.location.pathname;
+        return;
+      }
+      document.querySelectorAll('.role-button').forEach(button => button.classList.toggle('active', button.dataset.role === role));
+      document.querySelectorAll('[data-role-view]').forEach(view => view.classList.toggle('active', view.dataset.roleView === role));
+    }
+
+    function showScreen(id) {
+      const parent = document.getElementById(id)?.closest('.workarea');
+      if (!parent) return;
+      parent.querySelectorAll('.screen').forEach(screen => screen.classList.toggle('active', screen.id === id));
+      parent.closest('.role-view').querySelectorAll('.nav-item[data-screen-target]').forEach(item => item.classList.toggle('active', item.dataset.screenTarget === id));
+    }
+
+    function showResidentScreen(id) {
+      document.querySelectorAll('.phone-screen').forEach(screen => screen.classList.toggle('active', screen.id === id));
+      document.querySelectorAll('.phone-nav [data-resident-screen]').forEach(button => button.classList.toggle('active', button.dataset.residentScreen === id || (id === 'resident-repair' && button.dataset.residentScreen === 'resident-home')));
+    }
+
+    function applyInitialRoleMode() {
+      const params = new URLSearchParams(window.location.search);
+      const requestedRole = document.body.dataset.defaultRole || params.get('role') || 'platform';
+      const role = roleLabels[requestedRole] ? requestedRole : 'platform';
+      const singleRole = document.body.dataset.singleRole === 'true' || params.get('single') === '1';
+      if (singleRole) {
+        document.body.classList.add('single-role');
+        document.body.dataset.singleRole = 'true';
+        document.body.dataset.defaultRole = role;
+        const label = document.querySelector('.prototype-label');
+        if (label) label.innerHTML = `<i class="pulse"></i>${roleLabels[role]} · 独立工作台`;
+        document.title = `声边｜${roleLabels[role]}`;
+      }
+      switchRole(role);
+    }
+
+    document.querySelectorAll('.role-button').forEach(button => button.addEventListener('click', () => switchRole(button.dataset.role)));
+    document.querySelectorAll('[data-screen-target]').forEach(button => button.addEventListener('click', () => showScreen(button.dataset.screenTarget)));
+    document.querySelectorAll('[data-screen-jump]').forEach(button => button.addEventListener('click', () => showScreen(button.dataset.screenJump)));
+    document.querySelectorAll('[data-role-open]').forEach(button => button.addEventListener('click', () => switchRole(button.dataset.roleOpen)));
+    document.querySelectorAll('[data-resident-screen]').forEach(button => button.addEventListener('click', () => showResidentScreen(button.dataset.residentScreen)));
+    document.querySelectorAll('[data-toast]').forEach(button => button.addEventListener('click', () => showToast(button.dataset.toast)));
+    document.querySelectorAll('.choice-row button').forEach(button => button.addEventListener('click', () => { button.parentElement.querySelectorAll('button').forEach(item => item.classList.remove('active')); button.classList.add('active'); }));
+    applyInitialRoleMode();
+  </script>
+  <script src="shengbian-live.js"></script>
+</body>
+</html>
